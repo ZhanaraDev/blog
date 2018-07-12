@@ -1,0 +1,73 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Z.info{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Bootstrap core CSS -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="{% static 'css/blog-home.css' %}" rel="stylesheet">
+    {% block header %}
+    {% endblock %}
+</head>
+
+<body>
+<!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="#">Z.Info</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+
+        {% block bc %}
+            <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'mainapp:posts:all' %}">All Posts
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'mainapp:posts:top' %}">Top Posts</a>
+            </li>
+            </ul>
+        {% endblock %}
+        <ul class="navbar-nav ml-auto">
+        {% if user.is_authenticated %}
+            <li class="has-arrow"><a class="sb-close" href="{% url 'auth_logout' %}">Выйти</a></li>
+        {% else %}
+            <li class="has-arrow"><a class="sb-close" href="{% url 'auth_login' %}">Войти</a></li>
+
+        {% endif %}
+        </ul>
+        </div>
+      </div>
+    </nav>
+
+{% block content %}
+{% endblock %}
+<!-- Footer -->
+<footer class="py-5 bg-dark">
+  <div class="container">
+    <p class="m-0 text-center text-white">Copyright &copy; Your Website 2018</p>
+  </div>
+  <!-- /.container -->
+</footer>
+
+<!-- Bootstrap core JavaScript -->
+<script src="{% static 'js/jquery/jquery.min.js' %}"></script>
+<script src="{% static 'js/bootstrap.bundle.js' %}"></script>
+</body>
+
+{% block script %}
+{% endblock %}
+
+</html>
