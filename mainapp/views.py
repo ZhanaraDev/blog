@@ -31,8 +31,11 @@ class PostContentView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
         post_id = kwargs['post_id']
+
         try:
             context['post'] = Post.objects.get(id=post_id)
+            context['user_rated_post'] = Review.objects.filter(
+                post=context['post'], user=self.request.user).exists() if self.request.user.is_authenticated else False
             context['comments'] = Comment.objects.filter(post=context['post'])
         except Post.DoesNotExist:
             context['post_does_not_exist'] = "Sorry, but this post does not exist, check URL."
@@ -40,12 +43,6 @@ class PostContentView(TemplateView):
         return context
 
     def post(self, request, *args, **kwargs):
-        print("HURRICANE")
-        # print("ahhaa")
-        # print(kwargs)
-        # print("req")
-        # print(request.POST.get('comment-text'))
-        # post_id = kwargs['post_id']
         try:
             Comment.objects.create(user=request.user, text=request.POST.get('comment-text'),
                                    post=Post.objects.get(id=kwargs['post_id']))

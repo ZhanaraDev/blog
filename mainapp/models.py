@@ -43,7 +43,6 @@ class Post(models.Model):
 
     @property
     def rating(self):
-        print('epopo')
         qs = Review.objects.filter(post=self)
         avg_rating = qs.aggregate(Avg('mark')).get('mark__avg')
         return avg_rating if avg_rating else 0.0
