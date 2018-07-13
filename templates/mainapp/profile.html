@@ -62,9 +62,10 @@
 
         <div class="col-lg-4 pull-lg-8 text-xs-center">
             <img src={% if author %}{{ author.photo.url }}{% else %}"//placehold.it/150"{% endif %} class="m-x-auto img-fluid img-circle" alt="avatar">
-            <h6 class="m-t-2">{{ author.alias }}</h6>
-            <h6 class="m-t-2">Karma - {{ author.karma }}</h6>
-
+            {% if author %}
+                <h6 class="m-t-2">{{ author.alias }}</h6>
+                <h6 class="m-t-2">Karma - {{ author.karma }}</h6>
+            {% endif %}
         </div>
     </div>
 </div>
