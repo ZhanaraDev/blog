@@ -1,5 +1,8 @@
 # Create your views here.
-from django.views.generic import ListView, TemplateView
+from django.http import JsonResponse, HttpResponseRedirect
+from django.urls import reverse_lazy
+from django.views.decorators.csrf import csrf_exempt
+from django.views.generic import ListView, TemplateView, UpdateView, CreateView
 from .models import *
 
 
@@ -13,6 +16,19 @@ class PostListView(ListView):
         return qs.filter(status=1).order_by('creation_date')
 
 
+class PostCreateView(CreateView):
+    model = Post
+    template_name = 'mainapp/post-create.html'
+    success_url = reverse_lazy('mainapp:profile:view')
+    fields = ('name', 'image', 'link', 'text', 'status', 'category', 'image', )
+
+    def form_valid(self, form):
+        post = form.save(commit=False)
+        post.author = Author.objects.get(user=self.request.user)
+        post.save()
+        return HttpResponseRedirect(self.success_url)
+
+
 class TopPostListView(ListView):
     model = Post
     paginate_by = 3
@@ -21,7 +37,7 @@ class TopPostListView(ListView):
     def get_queryset(self):
         qs = super().get_queryset().filter(status=1)
 
-        return sorted(qs, key=lambda post: post.rating,reverse=True)[:10]
+        return sorted(qs, key=lambda post: post.rating, reverse=True)[:10]
 
 
 class PostContentView(TemplateView):
@@ -52,4 +68,42 @@ class PostContentView(TemplateView):
         return self.render_to_response(context)
 
 
+@csrf_exempt
+def send_review(request):
+    post_id = request.POST.get('post_id')
+    rating = request.POST.get('rating')
+    try:
+        Review.objects.create(user=request.user, mark=rating, post=Post.objects.get(id=post_id))
+    except Exception as e:
+        print(e)
+    return HttpResponseRedirect(reverse_lazy('mainapp:posts:read', args=(post_id,)))
 
+
+class CategoryListView(ListView):
+    model = Category
+    template_name = 'mainapp/categories.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['categories'] = Category.objects.all()
+        category_id = self.request.GET.get('category_id')
+        try:
+            category = Category.objects.get(id=category_id)
+        except Category.DoesNotExist:
+            category = None
+
+        context['posts'] = Post.objects.filter(category=category)
+        return context
+
+
+class ProfileView(TemplateView):
+    model = User
+    template_name = "mainapp/profile.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        try:
+            context['author'] = Author.objects.get(user=self.request.user)
+        except Author.DoesNotExist:
+            pass
+        return context

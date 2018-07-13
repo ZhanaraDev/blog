@@ -17,6 +17,15 @@ class Author(models.Model):
     alias = models.CharField(max_length=250, verbose_name="Псевдоним")
     photo = models.ImageField(upload_to="authors/", verbose_name="Фото")
 
+    @property
+    def karma(self):
+        posts = self.posts
+        return sum((post.rating for post in posts))
+
+    @property
+    def posts(self):
+        return Post.objects.filter(author=self)
+
     def __str__(self):
         return self.alias
 

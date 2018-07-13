@@ -4,6 +4,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
     <style>
+    .star:hover, .star:hover span{
+        color: red;
+    }
     .checked {
         color: Blue ;
     }
@@ -28,7 +31,7 @@
 
           <!-- Title -->
           <h1 class="mt-4">{{ post.name }}</h1>
-
+          <p class="lead">Post Rating: {{ post.rating }}</p>
           <!-- Author -->
           <p class="lead">
             by
@@ -88,64 +91,20 @@
             <h5 class="card-header">Rating</h5>
             <div class="card-body">
               <div class="input-group">
-                <span class="rating" data-default-value="{{ post.rating }}" style="margin-left:5px;margin-right: 5px; ">
-                    <span data-value="1" class="fa fa-star"></span>
-                    <span data-value="2" class="fa fa-star"></span>
-                    <span data-value="3" class="fa fa-star"></span>
-                    <span data-value="4" class="fa fa-star"></span>
-                    <span data-value="5" class="fa fa-star"></span>
-                </span>
-                <span class="input-group-btn">
                 {% if not user_rated_post %}
-                    <a href='' onclick=event.preventDefault();{% if request.user.is_anonymous %}askToLogin(){% else %}sendRating(){% endif %}>Rate the post</a>
-                {% else %}
-                    <p>You have already rated this post</p>
-                {% endif %}
+                <span class="rating" data-default-value="{{ post.rating }}" style="margin-left:5px;margin-right: 5px; ">
+                    <a class="star" id="1"><span data-value="1" class="fa fa-star"></span></a>
+                    <a class="star" id="2"><span data-value="2" class="fa fa-star"></span></a>
+                    <a class="star" id="3"><span data-value="3" class="fa fa-star"></span></a>
+                    <a class="star" id="4"><span data-value="4" class="fa fa-star"></span></a>
+                    <a class="star" id="5"><span data-value="5" class="fa fa-star"></span></a>
                 </span>
+                <span id='rating-response-text' class="input-group-btn">
+                {% else %}
+                    <p>You have already rated this post!</p>
+                </span>
+                {% endif %}
               </div>
-            </div>
-          </div>
-
-          <!-- Categories Widget -->
-          <div class="card my-4">
-            <h5 class="card-header">Categories</h5>
-            <div class="card-body">
-              <div class="row">
-                <div class="col-lg-6">
-                  <ul class="list-unstyled mb-0">
-                    <li>
-                      <a href="#">Web Design</a>
-                    </li>
-                    <li>
-                      <a href="#">HTML</a>
-                    </li>
-                    <li>
-                      <a href="#">Freebies</a>
-                    </li>
-                  </ul>
-                </div>
-                <div class="col-lg-6">
-                  <ul class="list-unstyled mb-0">
-                    <li>
-                      <a href="#">JavaScript</a>
-                    </li>
-                    <li>
-                      <a href="#">CSS</a>
-                    </li>
-                    <li>
-                      <a href="#">Tutorials</a>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Side Widget -->
-          <div class="card my-4">
-            <h5 class="card-header">Side Widget</h5>
-            <div class="card-body">
-              You can put anything you want inside of these side widgets. They are easy to use, and feature the new Bootstrap 4 card containers!
             </div>
           </div>
 
@@ -163,18 +122,27 @@
 
 {% block script %}
     <script>
-        jQuery(function($) {
-            var count = $('.rating').data('defaultValue');
-            console.log(count);
-            $('.rating > span').slice(0, count).addClass("checked")
-
-        });
 
         function askToLogin() {
            swal("To leave a comment you need to login");
         }
-        function sendRating() {
-            alert("hi");
-        }
+        
+        $('.star').on("click",function () {
+            {% if request.user.is_anonymous %}askToLogin();return;{% else %}{% endif %}
+            var rating = $( this ).attr('id');
+            console.log($( this ).attr('id'));
+
+            var xhr = new XMLHttpRequest();
+
+            var body = 'rating=' + encodeURIComponent(rating) +
+              '&post_id=' + encodeURIComponent({{ post.id }});
+
+            xhr.open("POST", "{% url 'mainapp:posts:send_review' %}", true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.send(body);
+            $('.rating').hide();
+            document.getElementById("rating-response-text").innerHTML="<p>Thank you for your rate.</p>";
+
+        });
     </script>
 {% endblock %}

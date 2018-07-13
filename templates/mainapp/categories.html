@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block bc %}
+    <ul class="navbar-nav ml-auto">
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'mainapp:posts:all' %}">All Posts
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'mainapp:posts:top' %}">Top Posts</a>
+    </li>
+    <li class="nav-item active">
+      <a class="nav-link" href="{% url 'mainapp:posts:categories' %}">Categories</a>
+    </li>
+
+  </ul>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8">
+              {% block heading %}
+              <h1 class="my-4">All Posts
+              </h1>
+              {% endblock %}
+              <!-- Blog Post -->
+              {% for post in posts %}
+              <div class="card mb-4">
+                <img class="card-img-top" src="{{ post.image.url }} " alt="Picture">
+                <div class="card-body">
+                  <h2 class="card-title">{{ post.name }}</h2>
+                  <p class="card-text">{{ post.text }}</p>
+                  <a href="{% url 'mainapp:posts:read' post.id %}" class="btn btn-primary">Read More &rarr;</a>
+                </div>
+                <div class="card-footer text-muted">
+                  {{ blog.creation_date }}
+                  Post Rating: {{ post.rating }}
+                </div>
+              </div>
+              {% endfor %}
+
+
+              <!-- Pagination -->
+            {% if is_paginated %}
+              <ul class="pagination justify-content-center mb-4">
+               {% if page_obj.has_previous %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ page_obj.previous_page_number }}">&larr; Older</a>
+                </li>
+                {% endif %}
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ page_obj.next_page_number }}">Newer &rarr;</a>
+                </li>
+                {% endif %}
+
+              </ul>
+            {% endif %}
+            </div>
+            <!-- Sidebar Widgets Column -->
+            <div class="col-md-4">
+              <!-- Side Widget -->
+              <div class="card my-4">
+                <h5 class="card-header">Categories</h5>
+                <div class="card-body">
+                {% for category in categories %}
+                <div class="card mb-4">
+                    <div class="card-body">
+                      <h2 class="card-title">{{ category.name }}</h2>
+                      <a href="{% url 'mainapp:posts:categories'%}?category_id={{ category.id }}" class="btn btn-primary">Read More &rarr;</a>
+                    </div>
+                </div>
+                {% endfor %}
+                </div>
+              </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

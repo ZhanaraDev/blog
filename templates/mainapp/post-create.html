@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container" style="margin: 100px;">
+        <div class="col-md-8">
+            {% block heading %}
+              <h1 class="my-4">Add Posts
+              </h1>
+              {% endblock %}
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <table class="table-hover">
+                    {{ form.as_table }}
+                </table>
+                <input type="submit" class="btn btn-primary">
+            </form>
+        </div>
+    </div>
+{%  endblock %}

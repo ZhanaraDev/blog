@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block head %}
+    <style>
+        .row{
+            margin: 1000px 0px 1000px 0px;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+
+    <div class="container" style="margin-top: 50px;">
+    <div class="row m-y-2">
+        <div class="col-lg-8 push-lg-4">
+            <ul class="nav nav-tabs">
+                <li class="nav-item">
+                    <a href="" data-target="#profile" data-toggle="tab" class="nav-link active">Profile</a>
+                </li>
+            </ul>
+            <div class="tab-content p-b-3">
+                <div class="tab-pane active" id="profile">
+                    <h4 class="m-y-2">User Profile</h4>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Username:</h6>
+                            <p>
+                                {{ request.user }}
+                            </p>
+                            <h6>Email:</h6>
+                            <p>
+                                {{ request.user.email}}
+                            </p>
+                        </div>
+                        {% if author %}
+                        <div class="col-md-12">
+                                <h4 class="m-t-2"><span class="fa fa-clock-o ion-clock pull-xs-right"></span> Author's Posts</h4>
+                                <table class="table table-hover table-striped">
+                                    <tbody>
+                                        {% for post in author.posts %}
+                                            <tr>
+                                                <td>
+                                                    <a href="{% url 'mainapp:posts:read' post.id %}"><strong>{{ post.name }}</strong></a>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                        <tr>
+                                            <td>
+                                                <a class="btn btn-primary" href="{% url 'mainapp:posts:add' %}">Add Post</a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        {% endif %}
+                    <!--/row-->
+                </div>
+
+            </div>
+        </div>
+
+        <div class="col-lg-4 pull-lg-8 text-xs-center">
+            <img src={% if author %}{{ author.photo.url }}{% else %}"//placehold.it/150"{% endif %} class="m-x-auto img-fluid img-circle" alt="avatar">
+            <h6 class="m-t-2">{{ author.alias }}</h6>
+            <h6 class="m-t-2">Karma - {{ author.karma }}</h6>
+
+        </div>
+    </div>
+</div>
+<hr>
+
+{% endblock %}
